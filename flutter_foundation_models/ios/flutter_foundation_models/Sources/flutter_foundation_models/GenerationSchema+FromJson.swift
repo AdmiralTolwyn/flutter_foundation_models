@@ -202,12 +202,22 @@ extension DynamicGenerationSchema {
         }
 
         let description = json["description"] as? String
-        let properties: [DynamicGenerationSchema.Property] = try propertiesJsonArray.map {
+        var properties: [DynamicGenerationSchema.Property] = try propertiesJsonArray.map {
             try DynamicGenerationSchema.Property.fromJson($0)
         }
 
+        // Apple's FoundationModels rejects struct schemas with zero properties.
+        // For tools that take no arguments, auto-inject a hidden optional
+        // placeholder so the schema is valid and the model can still call the tool.
         if properties.isEmpty {
-            throw GenerationSchemaError.invalidSchema("no valid properties found in struct")
+            properties = [
+                DynamicGenerationSchema.Property(
+                    name: "_unused",
+                    description: "No parameters needed",
+                    schema: DynamicGenerationSchema(type: Bool.self),
+                    isOptional: true
+                )
+            ]
         }
 
         return DynamicGenerationSchema(

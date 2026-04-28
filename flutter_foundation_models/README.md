@@ -4,6 +4,11 @@
 
 A Flutter plugin providing a direct port of Apple's Foundation Models framework for on-device AI, available on iOS 26+ and macOS 26+.
 
+> **vacuumbreather fork** — this fork carries two patches on top of upstream
+> `0.3.0` that make tool calling with text streaming reliable. See the
+> [CHANGELOG](CHANGELOG.md#031vacuumbreather1-fork) for details. Pull from
+> `https://github.com/AdmiralTolwyn/flutter_foundation_models` (branch `main`).
+
 ## Design Philosophy
 
 This package aims to be a **direct port of Swift's Foundation Models API** to Dart/Flutter. The API design mirrors Swift's native interfaces as closely as possible given Flutter's constraints:

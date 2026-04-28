@@ -1,3 +1,20 @@
+## 0.3.1+vacuumbreather.1 (fork)
+
+Fork-specific patches that fix two issues seen when using tool calling with
+streaming text responses.
+
+### Bug Fixes
+- **Empty schema crash** — Tools that take no arguments previously threw
+  `invalidSchema("no valid properties found in struct")` because Apple's
+  `DynamicGenerationSchema` rejects empty struct schemas. The plugin now
+  auto-injects a hidden optional `_unused: Bool` placeholder property when the
+  Dart side provides an empty `StructGenerationSchema`. No app changes needed.
+- **Empty/`"null"` snapshots during tool calls** — While the model is invoking a
+  tool, the underlying `streamResponse` emits empty or literal `"null"` content
+  snapshots that briefly clear partial UI text. The text streaming path now
+  filters these out before forwarding to Flutter, so consumers get a clean
+  monotonically-growing text stream.
+
 ## 0.3.0
 
 ### Breaking Changes

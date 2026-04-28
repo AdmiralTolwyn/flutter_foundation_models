@@ -481,12 +481,18 @@ class FoundationModelsHostApiImpl: FoundationModelsHostApi {
                     for try await snapshot in stream {
                         if Task.isCancelled { break }
 
-                        finalText = snapshot.content
+                        // During tool calls, the model emits empty/"null"
+                        // snapshots. Skip those to avoid flickering empty
+                        // updates on the Flutter side.
+                        let content = snapshot.content
+                        if content.isEmpty || content == "null" { continue }
+
+                        finalText = content
 
                         await MainActor.run {
                             self.flutterApi?.onTextStreamUpdate(
                                 streamId: streamId,
-                                text: snapshot.content
+                                text: content
                             ) { _ in }
                         }
                     }
