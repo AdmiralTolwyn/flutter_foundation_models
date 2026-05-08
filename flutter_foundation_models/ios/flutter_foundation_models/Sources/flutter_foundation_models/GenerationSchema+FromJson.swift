@@ -219,8 +219,10 @@ extension DynamicGenerationSchema {
                 )
             ]
         } else {
-            // Validate no duplicate property names
-            let names = properties.map { $0.name }
+            // Validate no duplicate property names.
+            // DynamicGenerationSchema.Property doesn't expose .name as a
+            // readable property on iOS 26 — extract names from the source JSON.
+            let names = propertiesJsonArray.compactMap { $0["name"] as? String }
             if Set(names).count != names.count {
                 throw GenerationSchemaError.invalidSchema("Duplicate property names in struct '\(name)'")
             }
