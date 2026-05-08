@@ -1,3 +1,29 @@
+## 0.3.1+vacuumbreather.2 (fork)
+
+### Bug Fixes
+- **`FlutterTool.swift` force unwraps removed** — `arguments.jsonString.data(using:
+  .utf8)!`, `try! JSONSerialization`, and `String(data:encoding:)!` all crashed
+  on malformed tool arguments. Replaced with `guard`/`try` that throw
+  `PigeonError` with descriptive codes (`INVALID_UTF8`, `ENCODE_ERROR`).
+- **`LanguageModelSession.dispose()` stream cleanup race** — `_isDisposed` was
+  set *after* cancelling streams and destroying the session. A stream completion
+  callback firing during `dispose()` could mutate `_activeStreams` concurrently.
+  Now `_isDisposed` is set first and `_activeStreams` is snapshot-cleared before
+  cancellation, preventing the race.
+- **Silent JSON parse failures logged** — `_parseJson()` in
+  `LanguageModelSession` and `_parseJsonString()` in `FlutterApiImpl` caught all
+  exceptions and returned `{}`. Parse errors are now logged via `debugPrint` in
+  debug builds so data corruption is visible during development.
+- **Tool lookup throws `PlatformException`** — `FlutterApiImpl.invokeTool()`
+  threw generic `Exception` on missing session/tool, which Pigeon could not map
+  back to a structured error on the Swift side. Now throws `PlatformException`
+  with codes `SESSION_NOT_FOUND` / `TOOL_NOT_FOUND`.
+- **`_unused` placeholder collision-safe** — The auto-injected placeholder for
+  zero-property struct schemas used the fixed name `_unused`, which would collide
+  if a Dart class had a field with that name. Now uses
+  `_placeholder_<UUID-prefix>` to guarantee uniqueness. Also validates that
+  non-empty struct schemas have no duplicate property names.
+
 ## 0.3.1+vacuumbreather.1 (fork)
 
 Fork-specific patches that fix two issues seen when using tool calling with

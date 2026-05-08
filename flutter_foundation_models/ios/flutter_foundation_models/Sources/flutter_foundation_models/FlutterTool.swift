@@ -28,9 +28,14 @@ struct FlutterTool: Tool {
     typealias Arguments = GeneratedContent
 
     func call(arguments: GeneratedContent) async throws -> Output {
-        let argumentsJson = try JSONSerialization.jsonObject(
-            with: arguments.jsonString.data(using: .utf8)!
-        )
+        guard let argumentData = arguments.jsonString.data(using: .utf8) else {
+            throw PigeonError(
+                code: "INVALID_UTF8",
+                message: "Tool arguments for '\(name)' are not valid UTF-8",
+                details: nil
+            )
+        }
+        let argumentsJson = try JSONSerialization.jsonObject(with: argumentData)
 
         let content = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Any, Error>) in
             let args = (argumentsJson as? [String: Any?])?.mapToOptionalKeys() ?? [:]
@@ -50,8 +55,14 @@ struct FlutterTool: Tool {
             }
         }
 
-        let json = try! JSONSerialization.data(withJSONObject: content, options: [])
-        let jsonString = String(data: json, encoding: .utf8)!
+        let json = try JSONSerialization.data(withJSONObject: content, options: [])
+        guard let jsonString = String(data: json, encoding: .utf8) else {
+            throw PigeonError(
+                code: "ENCODE_ERROR",
+                message: "Failed to encode tool result for '\(name)' as UTF-8",
+                details: nil
+            )
+        }
 
         return try Output(json: jsonString)
     }

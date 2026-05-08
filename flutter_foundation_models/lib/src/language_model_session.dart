@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_foundation_models/flutter_foundation_models.dart';
 import 'package:flutter_foundation_models/src/generated/foundation_models_api.g.dart';
 import 'package:flutter_foundation_models/src/pigeon_impl/flutter_api_impl.dart';
@@ -163,19 +164,21 @@ final class LanguageModelSession {
   /// Disposes the session and releases resources.
   Future<void> dispose() async {
     if (_isDisposed) return;
+    _isDisposed = true;
 
-    for (final streamId in _activeStreams.toList()) {
+    final streamIds = _activeStreams.toList();
+    _activeStreams.clear();
+
+    for (final streamId in streamIds) {
       try {
         await _hostApi.cancelStream(streamId);
       } catch (_) {}
       _flutterApiImpl.unregisterStream(streamId);
       _flutterApiImpl.unregisterTextStream(streamId);
     }
-    _activeStreams.clear();
 
     _flutterApiImpl.unregisterSession(_sessionId);
     await _hostApi.destroySession(_sessionId);
-    _isDisposed = true;
   }
 
   /// Generates a text response for the given prompt.
@@ -320,7 +323,8 @@ final class LanguageModelSession {
             )
           : <String, dynamic>{};
       return decoded.map((k, v) => MapEntry<String?, Object?>(k, v));
-    } catch (_) {
+    } catch (e) {
+      assert(() { debugPrint('LanguageModelSession._parseJson failed: $e'); return true; }());
       return {};
     }
   }

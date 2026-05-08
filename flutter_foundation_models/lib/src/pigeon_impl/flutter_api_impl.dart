@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_foundation_models/flutter_foundation_models.dart';
 import 'package:flutter_foundation_models/src/generated/foundation_models_api.g.dart';
 
@@ -111,12 +113,18 @@ class FlutterApiImpl implements FoundationModelsFlutterApi {
   ) async {
     final tools = _sessionTools[sessionId];
     if (tools == null) {
-      throw Exception('Session $sessionId not found');
+      throw PlatformException(
+        code: 'SESSION_NOT_FOUND',
+        message: 'Session $sessionId not registered on Dart side',
+      );
     }
 
     final tool = tools[toolName];
     if (tool == null) {
-      throw Exception('Tool $toolName not found in session $sessionId');
+      throw PlatformException(
+        code: 'TOOL_NOT_FOUND',
+        message: 'Tool $toolName not registered for session $sessionId',
+      );
     }
 
     final cleanedArgs = _cleanMapKeys(arguments);
@@ -180,7 +188,8 @@ class FlutterApiImpl implements FoundationModelsFlutterApi {
         const JsonDecoder().convert(json) as Map,
       );
       return decoded;
-    } catch (_) {
+    } catch (e) {
+      assert(() { debugPrint('FlutterApiImpl._parseJsonString failed: $e'); return true; }());
       return {};
     }
   }

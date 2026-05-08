@@ -212,12 +212,18 @@ extension DynamicGenerationSchema {
         if properties.isEmpty {
             properties = [
                 DynamicGenerationSchema.Property(
-                    name: "_unused",
+                    name: "_placeholder_\(UUID().uuidString.prefix(8))",
                     description: "No parameters needed",
                     schema: DynamicGenerationSchema(type: Bool.self),
                     isOptional: true
                 )
             ]
+        } else {
+            // Validate no duplicate property names
+            let names = properties.map { $0.name }
+            if Set(names).count != names.count {
+                throw GenerationSchemaError.invalidSchema("Duplicate property names in struct '\(name)'")
+            }
         }
 
         return DynamicGenerationSchema(
