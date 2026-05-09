@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main, vacuumbreather/main]
+  pull_request:
+    branches: [main, vacuumbreather/main]
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Flutter version
+        run: flutter --version
+
+      - name: Activate melos
+        run: dart pub global activate melos
+
+      - name: Bootstrap workspace
+        run: melos bootstrap
+
+      - name: Analyze plugin (lib only)
+        working-directory: flutter_foundation_models
+        run: dart analyze lib/
+
+      - name: Analyze annotations
+        working-directory: flutter_foundation_models_annotations
+        run: dart analyze lib/
+
+      - name: Analyze codegen
+        working-directory: flutter_foundation_models_gen
+        run: dart analyze lib/
+
+      - name: Test plugin
+        working-directory: flutter_foundation_models
+        run: flutter test
+        continue-on-error: true # No tests yet; don't fail CI until we add some

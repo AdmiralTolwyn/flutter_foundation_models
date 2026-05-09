@@ -96,6 +96,21 @@ Check out the [example app](flutter_foundation_models/example/) for demos of:
 
 Use `SystemLanguageModel.isAvailable` to check API availability at runtime.
 
+## Working on this monorepo
+
+This repo is a [melos](https://melos.invertase.dev/) workspace. After cloning,
+bootstrap the workspace before running `flutter pub get` or `flutter test` in
+any sub-package:
+
+```bash
+dart pub global activate melos
+melos bootstrap
+```
+
+`melos bootstrap` wires up the path-dependencies between the three packages
+(plugin, annotations, codegen) and the example app. Skipping this step leaves
+the example app unable to resolve `flutter_foundation_models_gen`.
+
 ## License
 
 MIT

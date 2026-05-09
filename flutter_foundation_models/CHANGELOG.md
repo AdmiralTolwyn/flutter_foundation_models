@@ -1,3 +1,13 @@
+## 0.3.1+vacuumbreather.3 (fork)
+
+### Hygiene Pass
+- **CI added** — `.github/workflows/ci.yml` runs `dart analyze` on all three
+  packages (plugin, annotations, codegen) on every push and PR.
+- **`README.md` documents melos bootstrap** — cloning + `flutter pub get`
+  inside the example app fails without `melos bootstrap` first because the
+  three packages reference each other via path. Now spelled out in the
+  top-level README.
+
 ## 0.3.1+vacuumbreather.2 (fork)
 
 ### Bug Fixes
