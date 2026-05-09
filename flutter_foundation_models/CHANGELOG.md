@@ -1,3 +1,12 @@
+## 0.3.1+vacuumbreather.4 (fork)
+
+### CI Fix
+- **`analyzer` downgraded to `^6.4.1`** in `flutter_foundation_models_gen` —
+  the previous `^6.7.0` constraint pulled in the `macros` package which
+  requires the `_macros` SDK package not available on Flutter stable CI
+  runners. Pinning below the macros transition (`<6.6.0`) fixes `melos
+  bootstrap` on CI.
+
 ## 0.3.1+vacuumbreather.3 (fork)
 
 ### Hygiene Pass
